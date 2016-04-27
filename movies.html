@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Rental Homework</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <style>
+    .container-top {
+        margin-top: 20px;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container container-top">
+        <p>MovieCo has released some data about all of their rentals in 2014. As a competitor, your job is to go though the data and get some insigts about your competitor!</p>
+        <p>Two questions are below, and we've retrieved the data for you... but it's probably not in the format you want. You'll have to go through and get the data to reveal the answers using your newfound skills with arrays, regex, and strings!</p>
+    </div>
+    <div class="container">
+        <table>
+            <tr>
+                <td>The user with the most checkouts is:</td>
+                <td><span id="most-checkouts"></span></td>
+            </tr>
+            <tr>
+                <td>The month with the most checkouts is:</td>
+                <td><span id="most-month"></span></td>
+            </tr>
+        </table>
+    </div>
+    <script>
+    /*** */
+    function loadDoc(uri, callback) {
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                callback.call(this, xmlhttp.responseText);
+            }
+        };
+        xmlhttp.open("GET", uri, true);
+        xmlhttp.send();
+    }
+    var rentalsArray;
+    var loadedRentals = function(rentalsJSON) {
+        rentalsArray = JSON.parse(rentalsJSON);
+        userFunction();
+    };
+    loadDoc("https://aerekos.herokuapp.com/getrentalsfile", loadedRentals);
+    </script>
+    <script>
+    function userFunction() {
+
+        var userArray = [];
+        var monthsArray = [];
+        for (var i = 0; i < rentalsArray.length; i++) {
+            userArray.push(rentalsArray[i].split(" ")[0]);
+            monthsArray.push(rentalsArray[i].split(" ")[2]);
+
+        }
+        userArray.sort();
+        monthsArray.sort();
+
+        function shortArray(arr) {
+            var newArray = [];
+            for (var i = 0; i < arr.length; i++) {
+                if (newArray.indexOf(arr[i]) == -1) {
+                    newArray.push(arr[i]);
+                }
+            }
+            return newArray;
+        }
+
+        var shortMonths = shortArray(monthsArray);
+        var shortArr = shortArray(userArray);
+        console.log(shortMonths);
+
+
+        function findMatch(arr, mainArray) {
+            var userNumbers = [];
+            for (var i = 0; i < arr.length; i++) {
+                var currentUser = arr[i];
+                var match = 0;
+                for (var k = 0; k < mainArray.length; k++) {
+                    if (currentUser === mainArray[k]) {
+                        match++;
+                    }
+                }
+                userNumbers.push(match);
+
+            }
+            return userNumbers;
+        }
+
+        var nums = findMatch(shortArr, userArray);
+        var months = findMatch(shortMonths, monthsArray);
+        console.log(months);
+
+        function findMax(arr) {
+            var max = 0;
+            for (var i = 0; i < arr.length; i++) {
+                if (max < arr[i]) {
+                    max = arr[i];
+                }
+            }
+            var myIndex = arr.indexOf(max); // indexOf gives us the value at the index where our maximums occur. 
+            return myIndex;
+        }
+
+        var myIndex = findMax(nums);
+        var monthsIndex = findMax(months);
+        console.log(findMax(months));
+
+
+
+
+        /*
+        	Okay! Let's figure out which user had the most checkouts!
+
+        	First you'll want to go through the array, which is composed of strings,
+        	and figure out how to get just the parts you want.
+        */
+
+        /*
+        	Now that we have our data in a consumable format, we just need to iterate through the
+        	arrays and keep track of which user had the most checkouts.
+
+        	Hint: You'll probably need to create at least one more array to keep track of checkout counts per user or per month.
+
+        	Write your code to calculate the answers, and put the answers in place of the "???" below.
+        */
+        //Which user had the most checkouts.
+        document.getElementById('most-checkouts').innerHTML = shortArr[myIndex] + " " + "with " + nums[myIndex] + " rentals";
+
+        //Which month has the most checkouts?
+        document.getElementById('most-month').innerHTML = shortMonths[monthsIndex] + " " + "with " + months[monthsIndex] + " rentals";
+    }
+    </script>
+</body>
+
+</html>
